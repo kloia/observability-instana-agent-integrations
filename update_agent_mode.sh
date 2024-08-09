@@ -39,4 +39,3 @@ else
     echo "Error: Configuration file $CONFIG_FILE not found."
     exit 1
 fi
-

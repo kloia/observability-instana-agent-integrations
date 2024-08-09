@@ -45,4 +45,3 @@ if (Test-Path -Path $configFile) {
     Write-Output "Error: Configuration file $configFile not found."
     exit 1
 }
-
