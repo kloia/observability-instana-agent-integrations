@@ -1,13 +1,15 @@
-Helm Setup 
+**Helm Setup**
 
 
 If the distro is only oc, apply the above step, otherwise skip it. 
+```bash
 $ oc adm policy add-scc-to-user privileged -z instana-agent
 $ oc adm policy add-scc-to-user anyuid -z instana-agent-remote -n instana-agent
-
+```
 
 
 Option1 
+```bash
 helm upgrade --install instana-agent \
    --repo https://agents.instana.io/helm \
    --namespace instana-agent \
@@ -21,11 +23,11 @@ helm upgrade --install instana-agent \
    --set agent.pod.limits.memory=1200Mi  \
    --set agent.pod.requests.memory=1200Mi  \
    instana-agent
-
-
+```
 
 
 Option2
+```bash
 helm upgrade --install instana-agent \
    --repo https://agents.instana.io/helm \
    --namespace instana-agent \
@@ -44,17 +46,19 @@ helm upgrade --install instana-agent \
    --set k8s_sensor.deployment.pod.requests.memory=768Mi \
    instana-agent
 
+```
 
 
+**Operator Setup**
 
-Operator Setup
-
-
+```bash
 $ kubectl create namespace instana-agent
 
 $ kubectl apply -f https://github.com/instana/instana-agent-operator/releases/latest/download/instana-agent-operator.yaml
+```
 
 $ vi instana-agent.customresource.yaml
+```bash
 apiVersion: instana.io/v1
 kind: InstanaAgent
 metadata:
@@ -81,30 +85,32 @@ spec:
     configuration_yaml: |
       # You can leave this empty, or use this to configure your instana agent.
       # See https://docs.instana.io/setup_and_manage/host_agent/on/kubernetes/
-
+```
    
-
-
+```bash
 $ kubectl apply -f instana-agent.customresource.yaml
+```
 
 Reference : https://www.ibm.com/docs/en/instana-observability/1.0.302?topic=openshift-installing-agent-red-hat#installing-by-using-the-operator
 
 
 
-Manuel Konfigurasyon
+**Manuel Konfigurasyon**
 
-
+```bash
 $ kubectl get ia --all-namespaces
 
 
 $ kubectl edit ia instana-agent -n instana-agent
-
+```
 
 Output Appearance: 
+```bash
 root@ip-172-31-46-125:/home/ubuntu# kubectl get ia --all-namespaces
 NAMESPACE       NAME            AGE
 instana-agent   instana-agent   37m
 root@ip-172-31-46-125:/home/ubuntu# kubectl edit ia instana-agent -n instana-agent
 instanaagent.instana.io/instana-agent edited
+```
 
 
