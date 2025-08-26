@@ -18,8 +18,8 @@ helm upgrade --install instana-agent \
    --set agent.downloadKey=rvA*******_0wg \
    --set agent.endpointHost=agent.instana.url \
    --set agent.endpointPort=443 \
-   --set cluster.name='oc-mcloud2-cluster' \
-   --set zone.name='prod-mcloud2' \
+   --set cluster.name='oc-any-cluster' \
+   --set zone.name='prod-any' \
    --set agent.pod.limits.memory=1200Mi  \
    --set agent.pod.requests.memory=1200Mi  \
    instana-agent
@@ -36,10 +36,10 @@ helm upgrade --install instana-agent \
    --set agent.downloadKey=rvA*********_0wg \
    --set agent.endpointHost=agent.instana.url \
    --set agent.endpointPort=443 \
-   --set cluster.name='oc-mcloud2-cluster' \
-   --set zone.name='prod-mcloud2' \
-   --set agent.pod.limits.memory=1200Mi  \
-   --set agent.pod.requests.memory=1200Mi  \
+   --set cluster.name='oc-any-cluster' \
+   --set zone.name='prod-any-zone' \
+   --set agent.pod.limits.memory=1000Mi  \
+   --set agent.pod.requests.memory=1000Mi  \
    --set k8s_sensor.deployment.pod.limits.cpu=1 \
    --set k8s_sensor.deployment.pod.limits.memory=768Mi \
    --set k8s_sensor.deployment.pod.requests.cpu=500m \
@@ -66,9 +66,9 @@ metadata:
   namespace: instana-agent
 spec:
   zone:
-    name: prod-mcloud2
+    name: prod-any-zone
   cluster:
-      name: oc-mcloud2-cluster
+      name: oc-any-cluster
   agent:
     key: hh1*******xmWCyE
     downloadKey: rvA********_0wg
