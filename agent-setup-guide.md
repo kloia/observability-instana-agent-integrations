@@ -19,7 +19,7 @@ helm upgrade --install instana-agent \
    --set agent.endpointHost=agent.instana.url \
    --set agent.endpointPort=443 \
    --set cluster.name='oc-any-cluster' \
-   --set zone.name='prod-any' \
+   --set zone.name='prod-any-zone' \
    --set agent.pod.limits.memory=1200Mi  \
    --set agent.pod.requests.memory=1200Mi  \
    instana-agent
