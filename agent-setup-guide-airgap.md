@@ -98,12 +98,19 @@ spec:
         value: "proxyuser"
       - name: INSTANA_AGENTREPOSITORY_PROXY_PASSWORD
         value: "password"
-      - name: INSTANA_MVN_REPOSITORY_FEATURES_PATH
-        value: agent-release@id=features@noreleases@snapshots@snapshotsUpdate=always
-      - name: INSTANA_MVN_REPOSITORY_SHARED_PATH                                    
-        value: shared@id=shared@snapshots@snapshotsUpdate=always                    
-      - name: INSTANA_MVN_REPOSITORY_URL                                            
-        value: https://repoName.repository   
+      - name: INSTANA_SHARED_REPOSITORY_MIRROR_USERNAME
+        value: "v1-2ExdO"
+      - name: INSTANA_SHARED_REPOSITORY_MIRROR_PASSWORD
+        value: "RMUWO-bm5YGiUySyLlpcDNdQjhkg9RROciUf-m1Cz5cs"
+      - name: AGENT_RELEASE_REPOSITORY_MIRROR_USERNAME
+        value: "v1-2ExdO"
+      - name: AGENT_RELEASE_REPOSITORY_MIRROR_PASSWORD
+        value: "RMUWO-bm5YGiUySyLlpcDNdQjhkg9RROciUf-m1Cz5cs"
+      - name: INSTANA_SHARED_REPOSITORY_MIRROR_URL
+        value: "https://nexus.thy.com/repository/instana-agent-maven-shared"
+      - name: AGENT_RELEASE_REPOSITORY_MIRROR_URL
+        value: "https://nexus.thy.com/repository/instana-maven-agent-release"
+      
     pod:
       requests:
         memory: 1200Mi
