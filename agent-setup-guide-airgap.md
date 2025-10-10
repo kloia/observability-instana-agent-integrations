@@ -98,6 +98,12 @@ spec:
         value: "proxyuser"
       - name: INSTANA_AGENTREPOSITORY_PROXY_PASSWORD
         value: "password"
+      - name: INSTANA_MVN_REPOSITORY_FEATURES_PATH
+        value: agent-release@id=features@noreleases@snapshots@snapshotsUpdate=always
+      - name: INSTANA_MVN_REPOSITORY_SHARED_PATH                                    
+        value: shared@id=shared@snapshots@snapshotsUpdate=always                    
+      - name: INSTANA_MVN_REPOSITORY_URL                                            
+        value: https://repoName.repository   
     pod:
       requests:
         memory: 1200Mi
