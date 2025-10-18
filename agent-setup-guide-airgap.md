@@ -48,7 +48,7 @@ helm upgrade --install instana-agent \
    --set k8s_sensor.deployment.pod.limits.memory=768Mi \
    --set k8s_sensor.deployment.pod.requests.cpu=500m \
    --set k8s_sensor.deployment.pod.requests.memory=768Mi \
- # Eğer backend için de proxy gerekiyorsa bu ikisini aktif et:
+ # Eğer backend için proxy gerekiyorsa bu ikisini aktif et:
   # --set agent.proxyHost='2.2.2.2' \                              # (Optional) Agent proxy host
   # --set agent.proxyPort='3128' \                                 # (Optional) Agent proxy port
 # Repository Proxy Configuration (Used for Maven downloads
@@ -60,6 +60,7 @@ helm upgrade --install instana-agent \
    instana-agent
 
 ```
+
 
 
 **Operator Setup**
@@ -79,7 +80,7 @@ metadata:
   namespace: instana-agent
 spec:
   zone:
-    name: prod-any-zone
+    name: zone_name_here    # typically set as a domain-specific name (e.g., CRM, PAYMENT, CRM_DB, PAYMENT_KAFKA)
   cluster:
       name: oc-any-cluster
   agent:
@@ -87,29 +88,33 @@ spec:
     downloadKey: rvA********_0wg
     endpointHost: agent.instana.url
     endpointPort: "443" 
-    env:
-      - name: INSTANA_AGENT|REPOSITORY_PROXY_ENABLED                             # (Optional) choose one option for each line regarding proxy kind. For both, append them. 
-        value: "true"
-      - name: INSTANA_AGENT|REPOSITORY_PROXY_HOST
-        value: "3.3.3.3"
-      - name: INSTANA_REPOSITORY_PROXY_PORT
-        value: "3128"
-      - name: INSTANA_AGENT|REPOSITORY_PROXY_USER
-        value: "proxyuser"
-      - name: INSTANA_AGENTREPOSITORY_PROXY_PASSWORD
-        value: "password"
-      - name: INSTANA_SHARED_REPOSITORY_MIRROR_USERNAME
-        value: "v1-2ExdO"
-      - name: INSTANA_SHARED_REPOSITORY_MIRROR_PASSWORD
-        value: "RMUWO-bm5YGiUySyLlpcDNdQjhkg9RROciUf-m1Cz5cs"
-      - name: AGENT_RELEASE_REPOSITORY_MIRROR_USERNAME
-        value: "v1-2ExdO"
-      - name: AGENT_RELEASE_REPOSITORY_MIRROR_PASSWORD
-        value: "RMUWO-bm5YGiUySyLlpcDNdQjhkg9RROciUf-m1Cz5cs"
-      - name: INSTANA_SHARED_REPOSITORY_MIRROR_URL
-        value: "https://nexus.thy.com/repository/instana-agent-maven-shared"
-      - name: AGENT_RELEASE_REPOSITORY_MIRROR_URL
-        value: "https://nexus.thy.com/repository/instana-maven-agent-release"
+#    env:
+#      - name: INSTANA_AGENT_PROXY_HOST                                      # (Optional) defines proxy between instana agent and instana backend (e.g., squid or similar)
+#        value: "3.3.3.3"         
+#      - name: INSTANA_AGENT_PROXY_PORT
+#        value: "3128"
+#      - name: INSTANA_REPOSITORY_PROXY_ENABLED                             # (Optional) defines proxy for downloading sensors and dependencies from repository
+#        value: "true"
+#      - name: INSTANA_REPOSITORY_PROXY_HOST                                 
+#        value: "3.3.3.3"
+#      - name: INSTANA_REPOSITORY_PROXY_PORT                                 
+#        value: "3.3.3.3"     
+#      - name: INSTANA_REPOSITORY_PROXY_USER
+#        value: "proxy-user"
+#      - name: INSTANA_REPOSITORY_PROXY_PASSWORD
+#        value: "proxy-user-password"
+#      - name: INSTANA_SHARED_REPOSITORY_MIRROR_USERNAME                               # (Optional) configure repository mirroring via nexus 
+#        value: "nexus-username"
+#      - name: INSTANA_SHARED_REPOSITORY_MIRROR_PASSWORD
+#        value: "nexus-pasword"
+#      - name: AGENT_RELEASE_REPOSITORY_MIRROR_USERNAME
+#        value: "nexus-username"
+#      - name: AGENT_RELEASE_REPOSITORY_MIRROR_PASSWORD
+#        value: "nexus-pasword"
+#      - name: INSTANA_SHARED_REPOSITORY_MIRROR_URL
+#        value: "https://nexus.local/repository/instana-shared"
+#      - name: AGENT_RELEASE_REPOSITORY_MIRROR_URL
+#        value: "https://nexus.local/repository/agent-release"
       
     pod:
       requests:
