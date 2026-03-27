@@ -1,0 +1,44 @@
+apiVersion: instana.io/v1
+kind: InstanaAgent
+metadata:
+  name: instana-agent
+  namespace: instana-agent
+spec:
+  openshift: true  # SCC tuning for Cluster Distro OCP 
+  zone:
+    name: instana  # dinamik_degisken. Her cluster için unique zone ismin düzenlenmeli. Örnek: DRC |  Cluster ismi ile aynı olabilir. 
+  cluster:
+    name: ocpinstana  # dinamik_degisken. Her cluster için unique isim düzenlenmeli
+  k8s_sensor:
+    deployment:
+      replicas: 3
+      pod:
+        limits:
+          cpu: "1500m"
+          memory: "4Gi"
+        requests:
+          cpu: "700m"
+          memory: "2Gi"
+  agent:
+    mode: INFRASTRUCTURE  #sabit_degisken  INFRASTRUCTURE mode yalnızca Self Monitoring Instana için. | APM | INFRASTRUCTURE | AWS
+    key: 7dfy3RQgFOcKVF58WQLl0K # sabit_degisken
+    downloadKey: aIUIJTniTXeLTAj5O_RZDg  #sabit_degisken
+    endpointHost: agent-acceptor.ocpinstana.turkiyesigorta.com.tr  #sabit_degisken
+    endpointPort: "443"  #sabit_degisken
+    env:
+      INSTANA_AGENT_TAGS: production        # dinamik_degisken. Ortam environment ' ına göre tag eklenebilir. | TEST | PRODUCTION
+    tolerations:
+      - operator: "Exists"   
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:          
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-role.kubernetes.io/master
+                  operator: DoesNotExist
+                - key: node-role.kubernetes.io/control-plane
+                  operator: DoesNotExist
+                    
+    configuration_yaml: |
+      # You can leave this empty, or use this to configure your instana agent.
+      # See https://ibm.biz/monitoring-k8s
