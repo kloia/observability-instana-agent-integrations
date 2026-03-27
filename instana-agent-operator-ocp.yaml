@@ -20,7 +20,7 @@ spec:
           cpu: "700m"
           memory: "2Gi"
   agent:
-    mode: INFRASTRUCTURE  #sabit_degisken  INFRASTRUCTURE mode yalnızca Self Monitoring Instana için. | APM | INFRASTRUCTURE | AWS
+    mode: INFRASTRUCTURE  #dinamik_degisken  INFRASTRUCTURE mode yalnızca Self Monitoring Instana için. | APM | INFRASTRUCTURE | AWS
     key: 7dfy3RQgFOcKVF58WQLl0K # sabit_degisken
     downloadKey: aIUIJTniTXeLTAj5O_RZDg  #sabit_degisken
     endpointHost: agent-acceptor.ocpinstana.turkiyesigorta.com.tr  #sabit_degisken
