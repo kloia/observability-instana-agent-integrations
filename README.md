@@ -16,7 +16,7 @@ scripts/    # automation utilities
 
 ## 📦 Content
 
-### Platform (Kubernetes / OpenShift)
+#### Platform (Kubernetes / OpenShift)
 
 - `platform/agent-setup-guide.md`  
 - `platform/agent-setup-guide-airgap.md`  
@@ -24,12 +24,12 @@ scripts/    # automation utilities
 - `platform/instana-agent-operator.yaml`  
 
 
-### Monolith
+#### Monolith
 
 - `monolith/nginx/nginx-instana.conf`  
 
 
-### Scripts
+#### Scripts
 
 - `scripts/instana-agent-label.sh`  
 - `scripts/update_agent_mode.sh` / `.ps1`  
