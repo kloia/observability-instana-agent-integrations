@@ -83,6 +83,11 @@ spec:
         memory: 1200Mi
         cpu: "1"
     configuration_yaml: |
+      com.instana.plugin.prometheus:
+        podConnectTimeout: 750
+        podReadTimeout: 2500
+        prometheusAnnotations: strict
+        poll_rate: 15
       # You can leave this empty, or use this to configure your instana agent.
       # See https://docs.instana.io/setup_and_manage/host_agent/on/kubernetes/
 ```

@@ -1,0 +1,50 @@
+apiVersion: instana.io/v1
+kind: InstanaAgent
+metadata:
+  name: instana-agent
+  namespace: instana-agent
+spec:
+  openshift: true  # SCC tuning for OpenShift cluster distribution
+  zone:
+    name: <zone-name>  # dynamic_variable. Must be unique per cluster. Example: DRC | Can be same as cluster name
+  cluster:
+    name: <cluster-name>  # dynamic_variable. Must be unique per cluster
+  k8s_sensor:
+    deployment:
+      replicas: 3
+      pod:
+        limits:
+          cpu: "1500m"
+          memory: "4Gi"
+        requests:
+          cpu: "700m"
+          memory: "2Gi"
+  agent:
+    mode: APM  # dynamic_variable. INFRASTRUCTURE mode is used only for Instana self-monitoring | APM | INFRASTRUCTURE | AWS
+    key: <agkey-here> # static_variable
+    downloadKey: <dkey-here>  # static_variable
+    endpointHost: agent-acceptor.instana.domain.com  # static_variable
+    endpointPort: "443"  # static_variable
+    env:
+      INSTANA_AGENT_TAGS: production  # dynamic_variable. Can be set based on environment (e.g., TEST | PRODUCTION)
+    tolerations:
+      - operator: "Exists"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-role.kubernetes.io/master
+                  operator: DoesNotExist
+                - key: node-role.kubernetes.io/control-plane
+                  operator: DoesNotExist
+                    
+    configuration_yaml: |
+      com.instana.plugin.prometheus:
+        podConnectTimeout: 750
+        podReadTimeout: 2500
+        prometheusAnnotations: strict
+        poll_rate: 15
+
+      # You can leave this empty, or use this to configure your Instana agent.
+      # See https://ibm.biz/monitoring-k8s
