@@ -14,8 +14,8 @@ helm upgrade --install instana-agent \
    --repo https://agents.instana.io/helm \
    --namespace instana-agent \
    --create-namespace \
-   --set agent.key=hh1*********mWCyE \
-   --set agent.downloadKey=rvA*******_0wg \
+   --set agent.key=hh1***********E \
+   --set agent.downloadKey=rvA********wg \
    --set agent.endpointHost=agent.instana.url \
    --set agent.endpointPort=443 \
    --set cluster.name='oc-any-cluster' \
@@ -33,7 +33,7 @@ helm upgrade --install instana-agent \
    --namespace instana-agent \
    --create-namespace \
    --set agent.key=hh1***********E \
-   --set agent.downloadKey=rvA*********_0wg \
+   --set agent.downloadKey=rvA***********wg \
    --set agent.endpointHost=agent.instana.url \
    --set agent.endpointPort=443 \
    --set cluster.name='oc-any-cluster' \
@@ -70,8 +70,8 @@ spec:
   cluster:
       name: oc-any-cluster
   agent:
-    key: hh1*******xmWCyE
-    downloadKey: rvA********_0wg
+    key: hh1***********E
+    downloadKey: rvA**********wg
     endpointHost: agent.instana.url
     endpointPort: "443" 
     env: {}
