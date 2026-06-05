@@ -48,9 +48,8 @@ helm upgrade --install instana-agent \
    --set k8s_sensor.deployment.pod.limits.memory=768Mi \
    --set k8s_sensor.deployment.pod.requests.cpu=500m \
    --set k8s_sensor.deployment.pod.requests.memory=768Mi \
- # Eğer backend için proxy gerekiyorsa bu ikisini aktif et:
-  # --set agent.proxyHost='2.2.2.2' \                              # (Optional) Agent proxy host
-  # --set agent.proxyPort='3128' \                                 # (Optional) Agent proxy port
+   #--set agent.proxyHost='2.2.2.2' \                              # (Optional) Agent proxy host
+   #--set agent.proxyPort='3128' \                                 # (Optional) Agent proxy port
 # Repository Proxy Configuration (Used for Maven downloads
    --set agent.env.INSTANA_REPOSITORY_PROXY_ENABLED='true' \
    --set agent.env.INSTANA_REPOSITORY_PROXY_HOST='3.3.3.3' \
@@ -84,8 +83,8 @@ spec:
   cluster:
       name: oc-any-cluster
   agent:
-    key: hh1*******xmWCyE
-    downloadKey: rvA********_0wg
+    key: hh1*********CyE
+    downloadKey: rvA*********g
     endpointHost: agent.instana.url
     endpointPort: "443" 
 #    env:
