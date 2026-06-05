@@ -27,8 +27,8 @@ if [[ -f "$CONFIG_FILE" ]]; then
 
 # Host and Port usually do not need to be changed, but can be modified to
 # tunnel connections. 
-host=agent-acceptor.instana.turkiyesigorta.com.tr
-port=8443
+host=agent-acceptor.instana.domain.com
+port=443
 protocol=HTTP/2
 
 
@@ -55,7 +55,7 @@ protocol=HTTP/2
 
 
 # Access Key for your SaaS installation. Is pre-filled during agent download.
-key=7dfy3RQgFOcKVF58WQLl0K
+key=7**********0K
 EOF
     echo "Update: Agent host and port adress has been changed in $CONFIG_FILE"
 
