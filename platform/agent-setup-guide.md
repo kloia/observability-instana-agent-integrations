@@ -44,6 +44,8 @@ helm upgrade --install instana-agent \
    --set k8s_sensor.deployment.pod.limits.memory=768Mi \
    --set k8s_sensor.deployment.pod.requests.cpu=500m \
    --set k8s_sensor.deployment.pod.requests.memory=768Mi \
+   --set agent.pod.env[0].name=INSTANA_AGENT_TAGS \
+   --set agent.pod.env[0].value="production" \
    instana-agent
 
 ```
