@@ -21,7 +21,7 @@ scripts/    # automation utilities
 - `platform/agent-setup-guide.md`  
 - `platform/agent-setup-guide-airgap.md`  
 - `platform/autotrace-webhook-setup.md`  
-- `platform/instana-agent-operator.yaml`  
+- `platform/*.md`  
 
 
 #### Monolith
