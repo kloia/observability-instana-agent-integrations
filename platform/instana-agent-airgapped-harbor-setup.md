@@ -190,7 +190,9 @@ instanaagent.instana.io/instana-agent edited
 Agent tags are configured with the following Helm value:
 
 ```bash
---set agent.env.INSTANA_AGENT_TAGS=production\,openshift\,mip-back-test
+  --set agent.pod.env[0].name=INSTANA_AGENT_TAGS \
+  --set agent.pod.env[0].value="production" \
+
 ```
 
 The commas are escaped with `\` because Helm parses comma-separated values inside `--set`.
