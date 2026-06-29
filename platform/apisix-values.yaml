@@ -1,0 +1,22 @@
+apisix:
+  admin:
+    allow:
+      ipList:
+      - 127.0.0.1/24
+      - 0.0.0.0/0
+  pluginAttrs:
+    opentelemetry:
+      collector:
+        address: http://otlp.url:4318
+        batch_span_processor:
+          batch_timeout: 2
+          drop_on_queue_full: false
+          inactive_timeout: 1
+          max_export_batch_size: 16
+          max_queue_size: 1024
+        request_timeout: 3
+      resource:
+        service.name: APISIX
+      trace_id_source: x-request-id
+  plugins:
+  - opentelemetry
