@@ -25,15 +25,25 @@ param(
     [Parameter(Mandatory, HelpMessage="Package Path")]
     [string]$INSTANA_PACKAGE_PATH,
 
-    [Parameter(Mandatory, HelpMessage="INSTANA_AGENT_KEY")]
-    [string]$INSTANA_AGENT_KEY,
+    # Not marked -Mandatory on purpose: passing secrets as CLI args leaks them into
+    # shell history / process listings. Prefer setting $env:INSTANA_AGENT_KEY and
+    # $env:INSTANA_DOWNLOAD_KEY before running the script; -INSTANA_AGENT_KEY /
+    # -INSTANA_DOWNLOAD_KEY still work if you pass them explicitly, and override the env var.
+    [Parameter(HelpMessage="INSTANA_AGENT_KEY (defaults to `$env:INSTANA_AGENT_KEY if unset)")]
+    [string]$INSTANA_AGENT_KEY = $env:INSTANA_AGENT_KEY,
 
-
-    [Parameter(Mandatory ,HelpMessage="INSTANA_DOWNLOAD_KEY")]
-    [string]$INSTANA_DOWNLOAD_KEY
-
-    
+    [Parameter(HelpMessage="INSTANA_DOWNLOAD_KEY (defaults to `$env:INSTANA_DOWNLOAD_KEY, then to INSTANA_AGENT_KEY, if unset)")]
+    [string]$INSTANA_DOWNLOAD_KEY = $env:INSTANA_DOWNLOAD_KEY
 )
+
+if (-not $INSTANA_AGENT_KEY) {
+    Write-Error "INSTANA_AGENT_KEY is required - pass -INSTANA_AGENT_KEY or set `$env:INSTANA_AGENT_KEY beforehand."
+    exit 1
+}
+
+if (-not $INSTANA_DOWNLOAD_KEY) {
+    $INSTANA_DOWNLOAD_KEY = $INSTANA_AGENT_KEY
+}
 
 $INSTANA_AGENT_DIR="C:\Program Files\Instana\instana-agent"
 $INSTANA_DEFAULT_MVN_PATH="C:\Program Files\Instana\instana-agent\etc\mvn-settings.xml"
@@ -51,9 +61,9 @@ Write-Output "AGENT_TAG: $AGENT_TAG"
 Write-Output "INSTANA_PACKAGE_PATH: $INSTANA_PACKAGE_PATH"
 Write-Output "INSTANA_AGENT_ENDPOINT: $INSTANA_AGENT_ENDPOINT"
 Write-Output "INSTANA_AGENT_ENDPOINT_PORT: $INSTANA_AGENT_ENDPOINT_PORT"
-Write-Output "INSTANA_AGENT_KEY: $INSTANA_AGENT_KEY"
+Write-Output "INSTANA_AGENT_KEY: ****** (set)"
 Write-Output "INSTANA_AGENT_MODE: $INSTANA_AGENT_MODE"
-Write-Output "INSTANA_DOWNLOAD_KEY: $INSTANA_DOWNLOAD_KEY"
+Write-Output "INSTANA_DOWNLOAD_KEY: ****** (set)"
 Write-Output "INSTANA_AGENT_DIR: $INSTANA_AGENT_DIR"
 
 

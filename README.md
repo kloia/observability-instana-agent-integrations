@@ -39,6 +39,22 @@ scripts/    # automation utilities
 
 ## 🚀 Instana Agent Installation (Linux / Windows Scripts)
 
+### Which install method should I use?
+
+There are two legitimate ways to install the Instana host agent on Linux — pick based on whether the box can reach Instana's package servers:
+
+- **Server has internet access (default, recommended)** → just use **Instana's own official auto-installer**. It sets up the yum/apt repo and downloads + installs the package itself — no manual package staging needed:
+
+  ```bash
+  curl -o setup_agent.sh https://setup.instana.io/agent
+  chmod 700 ./setup_agent.sh
+  sudo -E ./setup_agent.sh -a <agent-key> -d <download-key> -e <endpoint>:<port> -t static -s -y
+  ```
+
+  `<endpoint>` follows the [SaaS vs self-hosted](#backend-endpoint-saas-vs-self-hosted) rule below (e.g. `ingress-green-saas.instana.io:443`). Get the exact ready-to-run command (keys included) from Instana UI → **More → Agents → Installing Instana Agents**.
+
+- **Air-gapped / offline / no route to Instana's repo, or you need controlled/manual package staging** → use **this repository's `scripts/instana-agent-installation.sh` / `.ps1`** instead. Unlike the official installer above, these scripts do **not** reach out to Instana's repo servers — they assume you've already placed the package file locally and only handle the local install + configuration (mode, zone, tag, mvn-settings, multi-backend). This is the path documented in the rest of this section.
+
 ### Location
 
 The scripts live in `scripts/`:
@@ -78,13 +94,18 @@ Which host/port you give the script depends on where your Instana backend runs �
 #### Linux
 
 1. Must be run as **root** (or via `sudo`) — the script exits immediately otherwise.
-1. Download the Instana agent package for your distro **before** running the script (the script does not download it for you):
+1. Download the raw Instana agent package for your distro **before** running the script (the script does not download it for you):
+
+   - Go to Instana UI → **More → Agents → Installing Instana Agents**, pick your distro/architecture, and copy the exact `.rpm`/`.deb` download link shown there (it's versioned, e.g. `.../instana-team-release-agent-public-rpm-virtual/x86_64/instana-agent-static-<version>.x86_64.rpm` — it changes with each release, don't hardcode it).
+   - Fetch it from the server with that link, authenticating with your **download key** as the password (username is literally `_`):
 
    ```bash
-   curl -LO https://<download-key>:<agent-key>@packages.instana.io/<path-to-package>
+   curl -u "_:<download-key>" -LO https://packages.instana.io/instana-team-release-agent-public-rpm-virtual/x86_64/instana-agent-static-<version>.x86_64.rpm
    ```
 
-   Quick tip: RHEL → `.rpm` package, Debian/Ubuntu → `.deb` package.
+   `-L` matters — the link may redirect. Pass the downloaded file's path via `-p` to the script.
+
+   ⚠️ If you're on a **self-hosted** backend, the package host may not be `packages.instana.io` at all — get the right link/key from your own on-prem Instana UI, rather than assuming this SaaS one.
 
    On **air-gapped / offline hosts** without internet access, `curl` against `packages.instana.io` won't work — get the package from your internal artifact repository/mirror instead (or copy it over via SCP/USB) and just point `-p` at wherever it ends up locally; the script itself doesn't care how the file got there.
 1. Make the script executable:
@@ -113,7 +134,7 @@ Which host/port you give the script depends on where your Instana backend runs �
    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
    ```
 
-1. Download the Instana agent Windows installer before running the script — get the `.exe` from your Instana tenant's install page and note its local path.
+1. Download the Instana agent Windows installer before running the script: go to your Instana UI → **More → Agents → Installing Instana Agents** → Windows, and grab the `.exe` link + agent/download keys shown there (don't hand-type these — if you're on a **self-hosted** backend, use your own on-prem Instana UI, not SaaS docs). Note the installer's local path once downloaded.
 
    On **air-gapped / offline hosts**, grab the `.exe` from your internal artifact repository/mirror instead (or copy it over some other way) — just point `-INSTANA_PACKAGE_PATH` at wherever it ends up locally.
 
@@ -123,8 +144,8 @@ Which host/port you give the script depends on where your Instana backend runs �
 
 | Flag | Env var equivalent | Default | Description |
 | --- | --- | --- | --- |
-| `-a` | `INSTANA_AGENT_KEY` | — (required) | Agent key |
-| `-d` | `INSTANA_DOWNLOAD_KEY` | same as `-a` | Download key |
+| `-a` | `INSTANA_AGENT_KEY` | — (required) | Agent key — prefer the env var over `-a` (CLI args leak into shell history / `ps`) |
+| `-d` | `INSTANA_DOWNLOAD_KEY` | same as `-a` | Download key — prefer the env var over `-d`, same reason |
 | `-b` | `INSTANA_AGENT_HOST` | `ingress-blue-saas.instana.io` | Backend host — set this for a self-hosted/on-prem Instana backend |
 | `-P` | `INSTANA_AGENT_PORT` | `443` | Backend port |
 | `-e` | — | "" | First backend host for **multi-backend** setups (leave empty for single-backend) |
@@ -140,28 +161,38 @@ Which host/port you give the script depends on where your Instana backend runs �
 
 #### Linux Example Usage
 
+> The examples below export the agent/download key first and omit `-a`/`-d` on the command line, so secrets don't end up in shell history or `ps` output. Passing `-a`/`-d` directly still works if you'd rather do that.
+
 ##### Single backend, with tag and zone (Linux)
 
 ```bash
-./instana-agent-installation.sh -a agent-key -d agent-key -t agent-tag -z agent-zone -p package-path
+export INSTANA_AGENT_KEY=agent-key
+export INSTANA_DOWNLOAD_KEY=agent-key
+./instana-agent-installation.sh -t agent-tag -z agent-zone -p package-path
 ```
 
 ##### Self-hosted / on-prem backend (Linux)
 
 ```bash
-./instana-agent-installation.sh -a agent-key -d agent-key -t agent-tag -z agent-zone -p package-path -b agent-acceptor.instana.your-domain.com -P 443
+export INSTANA_AGENT_KEY=agent-key
+export INSTANA_DOWNLOAD_KEY=agent-key
+./instana-agent-installation.sh -t agent-tag -z agent-zone -p package-path -b agent-acceptor.instana.your-domain.com -P 443
 ```
 
 ##### Multi-backend, two Instana endpoints (Linux)
 
 ```bash
-./instana-agent-installation.sh -a agent-key -d agent-key -t agent-tag -z agent-zone -p package-path -e first-host -g second-host
+export INSTANA_AGENT_KEY=agent-key
+export INSTANA_DOWNLOAD_KEY=agent-key
+./instana-agent-installation.sh -t agent-tag -z agent-zone -p package-path -e first-host -g second-host
 ```
 
 ##### With a pre-configured mvn-settings file (Linux)
 
 ```bash
-./instana-agent-installation.sh -a agent-key -d agent-key -t agent-tag -z agent-zone -p package-path -e first-host -g second-host -u mvn-settings.xml
+export INSTANA_AGENT_KEY=agent-key
+export INSTANA_DOWNLOAD_KEY=agent-key
+./instana-agent-installation.sh -t agent-tag -z agent-zone -p package-path -e first-host -g second-host -u mvn-settings.xml
 ```
 
 #### Linux Uninstall
@@ -192,8 +223,8 @@ rm -rf /opt/instana
 
 | Parameter | Default | Description |
 | --- | --- | --- |
-| `INSTANA_AGENT_KEY` | — (required) | Agent key |
-| `INSTANA_DOWNLOAD_KEY` | — (required) | Download key |
+| `INSTANA_AGENT_KEY` | `$env:INSTANA_AGENT_KEY` | Agent key — prefer `$env:INSTANA_AGENT_KEY` over the flag (CLI args leak into shell history / process listings) |
+| `INSTANA_DOWNLOAD_KEY` | `$env:INSTANA_DOWNLOAD_KEY`, then falls back to `INSTANA_AGENT_KEY` | Download key — prefer the env var over the flag, same reason |
 | `INSTANA_PACKAGE_PATH` | — (required) | Local path to the downloaded installer |
 | `INSTANA_AGENT_ENDPOINT` | `ingress-blue-saas.instana.io` | Backend host — set this for a self-hosted/on-prem Instana backend |
 | `INSTANA_AGENT_ENDPOINT_PORT` | `443` | Backend port |
@@ -207,28 +238,38 @@ rm -rf /opt/instana
 
 #### Windows Example Usage
 
+> The examples below set `$env:INSTANA_AGENT_KEY`/`$env:INSTANA_DOWNLOAD_KEY` first and omit `-INSTANA_AGENT_KEY`/`-INSTANA_DOWNLOAD_KEY` on the command line, so secrets don't end up in shell history or process listings. Passing them as flags still works if you'd rather do that.
+
 ##### Single backend, with tag and zone (Windows)
 
 ```powershell
-.\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_PACKAGE_PATH exepackagepath -INSTANA_AGENT_KEY agent_key -INSTANA_DOWNLOAD_KEY download_key
+$env:INSTANA_AGENT_KEY = "agent_key"
+$env:INSTANA_DOWNLOAD_KEY = "download_key"
+.\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_PACKAGE_PATH exepackagepath
 ```
 
 ##### Self-hosted / on-prem backend (Windows)
 
 ```powershell
-.\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_PACKAGE_PATH exepackagepath -INSTANA_AGENT_KEY agent_key -INSTANA_DOWNLOAD_KEY download_key -INSTANA_AGENT_ENDPOINT agent-acceptor.instana.your-domain.com -INSTANA_AGENT_ENDPOINT_PORT 443
+$env:INSTANA_AGENT_KEY = "agent_key"
+$env:INSTANA_DOWNLOAD_KEY = "download_key"
+.\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_PACKAGE_PATH exepackagepath -INSTANA_AGENT_ENDPOINT agent-acceptor.instana.your-domain.com -INSTANA_AGENT_ENDPOINT_PORT 443
 ```
 
 ##### Multi-backend, two Instana endpoints (Windows)
 
 ```powershell
-.\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_AGENT_HOST_ONE firsthost -INSTANA_AGENT_HOST_TWO secondhost -INSTANA_PACKAGE_PATH exepackagepath -INSTANA_AGENT_KEY agent_key -INSTANA_DOWNLOAD_KEY download_key
+$env:INSTANA_AGENT_KEY = "agent_key"
+$env:INSTANA_DOWNLOAD_KEY = "download_key"
+.\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_AGENT_HOST_ONE firsthost -INSTANA_AGENT_HOST_TWO secondhost -INSTANA_PACKAGE_PATH exepackagepath
 ```
 
 ##### With a pre-configured mvn-settings file (Windows)
 
 ```powershell
-.\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_AGENT_HOST_ONE firsthost -INSTANA_AGENT_HOST_TWO secondhost -INSTANA_PACKAGE_PATH exepackagepath -INSTANA_AGENT_KEY agent_key -INSTANA_DOWNLOAD_KEY download_key -INSTANA_MVN_CONF_PATH mvnsettingspath
+$env:INSTANA_AGENT_KEY = "agent_key"
+$env:INSTANA_DOWNLOAD_KEY = "download_key"
+.\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_AGENT_HOST_ONE firsthost -INSTANA_AGENT_HOST_TWO secondhost -INSTANA_PACKAGE_PATH exepackagepath -INSTANA_MVN_CONF_PATH mvnsettingspath
 ```
 
 #### Windows Uninstall
