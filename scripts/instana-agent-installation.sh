@@ -13,7 +13,7 @@ PKG_URI=packages.instana.io
 AGENT_TYPE="dynamic"
 PROMPT=true
 START=false
-MODE="apm"
+MODE="infra"
 INSTANA_AGENT_SYSTEMD_TYPE=simple
 # Defaults to Instana SaaS; override with -b/-P (or by exporting these before
 # running the script) for a self-hosted / on-prem backend.

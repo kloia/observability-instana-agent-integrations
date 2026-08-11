@@ -1,11 +1,14 @@
  #! /opt/microsoft/powershell/7/pwsh
  
 param(
-    [Parameter(HelpMessage="Instana Agent Backend Endpoint (self-hosted/on-prem host, defaults to Instana SaaS)")]
-    [string]$INSTANA_AGENT_ENDPOINT = "ingress-blue-saas.instana.io",
+    # Defaults to Instana SaaS. Override with -INSTANA_AGENT_ENDPOINT/-INSTANA_AGENT_ENDPOINT_PORT,
+    # or by setting $env:INSTANA_AGENT_ENDPOINT/$env:INSTANA_AGENT_ENDPOINT_PORT beforehand,
+    # for a self-hosted/on-prem backend.
+    [Parameter(HelpMessage="Instana Agent Backend Endpoint (self-hosted/on-prem host, defaults to `$env:INSTANA_AGENT_ENDPOINT or Instana SaaS)")]
+    [string]$INSTANA_AGENT_ENDPOINT = $(if ($env:INSTANA_AGENT_ENDPOINT) { $env:INSTANA_AGENT_ENDPOINT } else { "ingress-blue-saas.instana.io" }),
 
-    [Parameter(HelpMessage="Instana Agent Backend Endpoint Port")]
-    [string]$INSTANA_AGENT_ENDPOINT_PORT = "443",
+    [Parameter(HelpMessage="Instana Agent Backend Endpoint Port (defaults to `$env:INSTANA_AGENT_ENDPOINT_PORT or 443)")]
+    [string]$INSTANA_AGENT_ENDPOINT_PORT = $(if ($env:INSTANA_AGENT_ENDPOINT_PORT) { $env:INSTANA_AGENT_ENDPOINT_PORT } else { "443" }),
 
     [Parameter(HelpMessage="Instana Agent Backend-1")]
     [string]$INSTANA_AGENT_HOST_ONE,
@@ -51,7 +54,7 @@ $INSTANA_CONF_FILE="C:\Program Files\Instana\instana-agent\etc\instana\configura
 $INSTANA_BACKEND_FILE="C:\Program Files\Instana\instana-agent\etc\instana\com.instana.agent.main.sender.Backend.cfg"
 $INSTANA_BACKEND_ONE_PATH="C:\Program Files\Instana\instana-agent\etc\instana\com.instana.agent.main.sender.Backend-1.cfg"
 $INSTANA_BACKEND_TWO_PATH="C:\Program Files\Instana\instana-agent\etc\instana\com.instana.agent.main.sender.Backend-2.cfg"
-$INSTANA_AGENT_MODE="apm"
+$INSTANA_AGENT_MODE="infra"
 
 Write-Output "INSTANA_AGENT_HOST_ONE: $INSTANA_AGENT_HOST_ONE"
 Write-Output "INSTANA_AGENT_HOST_TWO: $INSTANA_AGENT_HOST_TWO"

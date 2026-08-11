@@ -89,6 +89,28 @@ Which host/port you give the script depends on where your Instana backend runs �
 - If you're on **SaaS**, you don't need to set anything — the scripts already default to the SaaS address. Confirm the exact value under your Instana UI → **More → Agents → Installing Instana Agents** if unsure.
 - If you're on a **self-hosted** backend, you must pass it explicitly with `-b`/`-P` (Linux) or `-INSTANA_AGENT_ENDPOINT`/`-INSTANA_AGENT_ENDPOINT_PORT` (Windows) — get the exact hostname from your Instana platform admin or your self-hosted Instana's agent install page.
 
+### Environment variables
+
+Set these **before** running either script instead of passing them as CLI flags — both scripts fall back to these env vars, and it keeps secrets out of shell history / process listings. Everything here is optional except the agent key; unset values fall back to their defaults (SaaS endpoint, download key = agent key).
+
+**Linux:**
+
+```bash
+export INSTANA_AGENT_KEY=<agent-key>            # required (or pass -a)
+export INSTANA_DOWNLOAD_KEY=<agent-key>         # optional, defaults to INSTANA_AGENT_KEY
+export INSTANA_AGENT_HOST=<backend-host>        # optional, defaults to SaaS — e.g. agent-acceptor.instana.your-domain.com
+export INSTANA_AGENT_PORT=<backend-port>        # optional, defaults to 443
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:INSTANA_AGENT_KEY = "<agent-key>"                      # required (or pass -INSTANA_AGENT_KEY)
+$env:INSTANA_DOWNLOAD_KEY = "<agent-key>"                   # optional, defaults to INSTANA_AGENT_KEY
+$env:INSTANA_AGENT_ENDPOINT = "<backend-host>"              # optional, defaults to SaaS — e.g. agent-acceptor.instana.your-domain.com
+$env:INSTANA_AGENT_ENDPOINT_PORT = "<backend-port>"         # optional, defaults to 443
+```
+
 ### Prerequisites
 
 #### Linux
@@ -114,16 +136,7 @@ Which host/port you give the script depends on where your Instana backend runs �
    chmod +x instana-agent-installation.sh
    ```
 
-1. (Optional) Instead of passing flags, you can export any of these before running the script — the script falls back to the SaaS defaults only if they're unset:
-
-   ```bash
-   export INSTANA_AGENT_KEY=<agent-key>
-   export INSTANA_DOWNLOAD_KEY=<agent-key>
-   export INSTANA_AGENT_HOST=<self-hosted-backend-host>   # e.g. agent-acceptor.instana.your-domain.com
-   export INSTANA_AGENT_PORT=<self-hosted-backend-port>
-   ```
-
-   Same effect as passing `-b`/`-P` on the command line (see the options table below) — useful for **self-hosted / on-prem Instana backends**, where the endpoint isn't the SaaS default.
+1. (Optional) Set the [environment variables](#environment-variables) above instead of passing `-a`/`-d`/`-b`/`-P` on the command line.
 
 #### Windows
 
@@ -134,9 +147,11 @@ Which host/port you give the script depends on where your Instana backend runs �
    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
    ```
 
-1. Download the Instana agent Windows installer before running the script: go to your Instana UI → **More → Agents → Installing Instana Agents** → Windows, and grab the `.exe` link + agent/download keys shown there (don't hand-type these — if you're on a **self-hosted** backend, use your own on-prem Instana UI, not SaaS docs). Note the installer's local path once downloaded.
+1. Download the Instana agent Windows installer before running the script — same idea as Linux: go to Instana UI → **More → Agents → Installing Instana Agents**, pick Windows, and grab the exact `.exe` download link shown there (it's versioned, e.g. `.../instana-team-release-generic-virtual/com/instana/agent-assembly-offline/<version>/agent-assembly-offline-<version>-windows-64bit-offline.exe` — it changes with each release, don't hardcode it). Open that link in a browser, authenticate with your Instana credentials/download key when prompted, and save the `.exe` locally. If you're on a **self-hosted** backend, get the link from your own on-prem Instana UI instead.
 
    On **air-gapped / offline hosts**, grab the `.exe` from your internal artifact repository/mirror instead (or copy it over some other way) — just point `-INSTANA_PACKAGE_PATH` at wherever it ends up locally.
+
+1. (Optional) Set the [environment variables](#environment-variables) above instead of passing `-INSTANA_AGENT_KEY`/`-INSTANA_DOWNLOAD_KEY`/`-INSTANA_AGENT_ENDPOINT`/`-INSTANA_AGENT_ENDPOINT_PORT` on the command line.
 
 ### Linux Installation
 
@@ -154,7 +169,7 @@ Which host/port you give the script depends on where your Instana backend runs �
 | `-u` | — | "" | Path to a pre-configured `mvn-settings.xml` |
 | `-t` | — | "" | Agent tag |
 | `-z` | — | "" | Agent zone |
-| `-m` | — | `apm` | Agent mode: `apm` \| `aws` \| `infra` |
+| `-m` | — | `infra` | Agent mode: `apm` \| `aws` \| `infra` |
 | `-n` | — | off | Use systemd `notify` service type instead of `simple` |
 
 > `-b`/`-P` set the **single-backend** endpoint (SaaS or self-hosted). `-e`/`-g` are a separate, independent mechanism for **multi-backend** setups (they write two backend config files instead of one) — don't mix the two unless you actually run a dual-backend setup.
@@ -193,28 +208,6 @@ export INSTANA_DOWNLOAD_KEY=agent-key
 export INSTANA_AGENT_KEY=agent-key
 export INSTANA_DOWNLOAD_KEY=agent-key
 ./instana-agent-installation.sh -t agent-tag -z agent-zone -p package-path -e first-host -g second-host -u mvn-settings.xml
-```
-
-#### Linux Uninstall
-
-**RHEL (rpm):**
-
-```bash
-rpm -qa | grep instana-agent
-rpm -e <package-name>
-```
-
-**Debian (dpkg):**
-
-```bash
-dpkg -l | grep instana-agent
-dpkg -r <package-name>
-```
-
-**Cleanup (both):**
-
-```bash
-rm -rf /opt/instana
 ```
 
 ### Windows Installation
