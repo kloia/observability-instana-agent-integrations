@@ -48,6 +48,17 @@ if (-not $INSTANA_DOWNLOAD_KEY) {
     $INSTANA_DOWNLOAD_KEY = $INSTANA_AGENT_KEY
 }
 
+# Resolve to a full path before invoking with '&': unlike cmd.exe, PowerShell does not
+# search the current directory for executables, so a bare filename (or a relative path
+# without a leading .\) makes '&' treat it as a PATH lookup and fail with
+# "term '...' is not recognized...". Resolve-Path also gives a clear error up front if
+# the file genuinely doesn't exist, instead of a confusing CommandNotFoundException.
+if (-not (Test-Path -LiteralPath $INSTANA_PACKAGE_PATH)) {
+    Write-Error "INSTANA_PACKAGE_PATH not found: $INSTANA_PACKAGE_PATH"
+    exit 1
+}
+$INSTANA_PACKAGE_PATH = (Resolve-Path -LiteralPath $INSTANA_PACKAGE_PATH).Path
+
 $INSTANA_AGENT_DIR="C:\Program Files\Instana\instana-agent"
 $INSTANA_DEFAULT_MVN_PATH="C:\Program Files\Instana\instana-agent\etc\mvn-settings.xml"
 $INSTANA_CONF_FILE="C:\Program Files\Instana\instana-agent\etc\instana\configuration.yaml"
