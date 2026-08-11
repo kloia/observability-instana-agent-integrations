@@ -86,8 +86,12 @@ Which host/port you give the script depends on where your Instana backend runs �
 | **Instana SaaS** (default, most common) | `ingress-<color>-saas.instana.io` | `ingress-blue-saas.instana.io` |
 | **Self-hosted / on-prem Instana** | `agent-acceptor.instana.<your-company-domain>` | `agent-acceptor.instana.example.com` |
 
-- If you're on **SaaS**, you don't need to set anything — the scripts already default to the SaaS address. Confirm the exact value under your Instana UI → **More → Agents → Installing Instana Agents** if unsure.
-- If you're on a **self-hosted** backend, you must pass it explicitly with `-b`/`-P` (Linux) or `-INSTANA_AGENT_ENDPOINT`/`-INSTANA_AGENT_ENDPOINT_PORT` (Windows) — get the exact hostname from your Instana platform admin or your self-hosted Instana's agent install page.
+⚠️ **The scripts default to `ingress-blue-saas.instana.io` — that's just an example SaaS color, not necessarily yours.** SaaS tenants can be on `blue`, `green`, `red`, etc.; if your tenant isn't actually `blue`, the agent installs fine, the service runs, and there's no error at install time — it just gets a silent `403 Forbidden` ("agent key is most likely wrong") when talking to the wrong-colored backend, and never shows up in Instana UI. **Always confirm your tenant's exact color** under Instana UI → **More → Agents → Installing Instana Agents** and pass it explicitly:
+
+- **SaaS**: pass your tenant's real endpoint with `-b`/`-P` (Linux, env var `INSTANA_AGENT_HOST`/`INSTANA_AGENT_PORT`) or `-INSTANA_AGENT_ENDPOINT`/`-INSTANA_AGENT_ENDPOINT_PORT` (Windows) — don't rely on the default matching yours.
+- **Self-hosted**: same flags, get the exact hostname from your Instana platform admin or your self-hosted Instana's agent install page.
+
+If the agent doesn't show up in Instana UI after install, this endpoint mismatch is the most common cause — check for `403 Forbidden` in the agent log (`.../data/log/agent.log` on Windows, `${AGENT_DIR}/log/` on Linux) before looking anywhere else.
 
 ### Environment variables
 
