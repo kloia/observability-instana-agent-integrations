@@ -1,47 +1,8 @@
-# Instana Agent Integration Scripts & Setup Guides
+# Instana Agent Installation (Linux rpm/deb & Windows)
 
-A lightweight collection of scripts and guides focused on **Instana agent-side integrations**.
+## Location
 
-This repository covers how applications and environments are connected to Instana using agents, AutoTrace, and supporting automation tools.
-
-
-## 📂 Structure
-
-```bash
-platform/   # Kubernetes / OpenShift (agent integrations)
-monolith/   # VM / standalone integrations (e.g., NGINX)
-scripts/    # automation utilities
-```
-
-
-## 📦 Content
-
-#### Platform (Kubernetes / OpenShift)
-
-- `platform/agent-setup-guide.md`  
-- `platform/agent-setup-guide-airgap.md`  
-- `platform/autotrace-webhook-setup.md`  
-- `platform/*.md`  
-
-
-#### Monolith
-
-- `monolith/nginx/nginx-instana.conf`  
-
-
-#### Scripts
-
-- `scripts/instana-agent-installation.sh` / `.ps1` → see [Instana Agent Installation](#-instana-agent-installation-linux--windows-scripts) below
-- `scripts/instana-agent-label.sh`  
-- `scripts/update_agent_mode.sh` / `.ps1`  
-- `scripts/update_agent_host.sh`  
-
-
-## 🚀 Instana Agent Installation (Linux / Windows Scripts)
-
-### Location
-
-The scripts live in `scripts/`:
+The scripts live in [`scripts/`](../scripts/):
 
 - `scripts/instana-agent-installation.sh` (Linux)
 - `scripts/instana-agent-installation.ps1` (Windows)
@@ -56,12 +17,12 @@ cd scripts/
 cd scripts\
 ```
 
-### Supported platforms
+## Supported platforms
 
 - **Linux**: RHEL family (`rpm`), Debian family (`dpkg`) — architectures `x86_64`, `aarch64`, `s390x`, `ppc64le`. macOS, AIX and Solaris are explicitly rejected by the script.
 - **Windows**: package installed silently via the Instana `.exe` installer.
 
-### Backend endpoint: SaaS vs self-hosted
+## Backend endpoint: SaaS vs self-hosted
 
 Which host/port you give the script depends on where your Instana backend runs — pick the row that matches your tenant:
 
@@ -73,9 +34,9 @@ Which host/port you give the script depends on where your Instana backend runs �
 - If you're on **SaaS**, you don't need to set anything — the scripts already default to the SaaS address. Confirm the exact value under your Instana UI → **More → Agents → Installing Instana Agents** if unsure.
 - If you're on a **self-hosted** backend, you must pass it explicitly with `-b`/`-P` (Linux) or `-INSTANA_AGENT_ENDPOINT`/`-INSTANA_AGENT_ENDPOINT_PORT` (Windows) — get the exact hostname from your Instana platform admin or your self-hosted Instana's agent install page.
 
-### Prerequisites
+## Prerequisites
 
-#### Linux
+### Linux
 
 1. Must be run as **root** (or via `sudo`) — the script exits immediately otherwise.
 1. Download the Instana agent package for your distro **before** running the script (the script does not download it for you):
@@ -104,7 +65,7 @@ Which host/port you give the script depends on where your Instana backend runs �
 
    Same effect as passing `-b`/`-P` on the command line (see the options table below) — useful for **self-hosted / on-prem Instana backends**, where the endpoint isn't the SaaS default.
 
-#### Windows
+### Windows
 
 1. Open PowerShell **as Administrator** — the installer writes to `C:\Program Files\Instana` and otherwise fails silently.
 1. Allow the script to run for the current session (default PowerShell execution policy blocks `.ps1` files):
@@ -117,9 +78,9 @@ Which host/port you give the script depends on where your Instana backend runs �
 
    On **air-gapped / offline hosts**, grab the `.exe` from your internal artifact repository/mirror instead (or copy it over some other way) — just point `-INSTANA_PACKAGE_PATH` at wherever it ends up locally.
 
-### Linux Installation
+## Linux Installation
 
-#### Linux Configuration Options
+### Linux Configuration Options
 
 | Flag | Env var equivalent | Default | Description |
 | --- | --- | --- | --- |
@@ -138,33 +99,33 @@ Which host/port you give the script depends on where your Instana backend runs �
 
 > `-b`/`-P` set the **single-backend** endpoint (SaaS or self-hosted). `-e`/`-g` are a separate, independent mechanism for **multi-backend** setups (they write two backend config files instead of one) — don't mix the two unless you actually run a dual-backend setup.
 
-#### Linux Example Usage
+### Linux Example Usage
 
-##### Single backend, with tag and zone (Linux)
+#### Single backend, with tag and zone (Linux)
 
 ```bash
 ./instana-agent-installation.sh -a agent-key -d agent-key -t agent-tag -z agent-zone -p package-path
 ```
 
-##### Self-hosted / on-prem backend (Linux)
+#### Self-hosted / on-prem backend (Linux)
 
 ```bash
 ./instana-agent-installation.sh -a agent-key -d agent-key -t agent-tag -z agent-zone -p package-path -b agent-acceptor.instana.your-domain.com -P 443
 ```
 
-##### Multi-backend, two Instana endpoints (Linux)
+#### Multi-backend, two Instana endpoints (Linux)
 
 ```bash
 ./instana-agent-installation.sh -a agent-key -d agent-key -t agent-tag -z agent-zone -p package-path -e first-host -g second-host
 ```
 
-##### With a pre-configured mvn-settings file (Linux)
+#### With a pre-configured mvn-settings file (Linux)
 
 ```bash
 ./instana-agent-installation.sh -a agent-key -d agent-key -t agent-tag -z agent-zone -p package-path -e first-host -g second-host -u mvn-settings.xml
 ```
 
-#### Linux Uninstall
+### Linux Uninstall
 
 **RHEL (rpm):**
 
@@ -186,9 +147,9 @@ dpkg -r <package-name>
 rm -rf /opt/instana
 ```
 
-### Windows Installation
+## Windows Installation
 
-#### Windows Configuration Options
+### Windows Configuration Options
 
 | Parameter | Default | Description |
 | --- | --- | --- |
@@ -205,62 +166,33 @@ rm -rf /opt/instana
 
 > `INSTANA_AGENT_ENDPOINT`/`_PORT` set the **single-backend** endpoint (SaaS or self-hosted) used at install time. `INSTANA_AGENT_HOST_ONE`/`_TWO` are a separate, independent mechanism for **multi-backend** setups (they write two backend config files after install) — don't mix the two unless you actually run a dual-backend setup.
 
-#### Windows Example Usage
+### Windows Example Usage
 
-##### Single backend, with tag and zone (Windows)
+#### Single backend, with tag and zone (Windows)
 
 ```powershell
 .\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_PACKAGE_PATH exepackagepath -INSTANA_AGENT_KEY agent_key -INSTANA_DOWNLOAD_KEY download_key
 ```
 
-##### Self-hosted / on-prem backend (Windows)
+#### Self-hosted / on-prem backend (Windows)
 
 ```powershell
 .\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_PACKAGE_PATH exepackagepath -INSTANA_AGENT_KEY agent_key -INSTANA_DOWNLOAD_KEY download_key -INSTANA_AGENT_ENDPOINT agent-acceptor.instana.your-domain.com -INSTANA_AGENT_ENDPOINT_PORT 443
 ```
 
-##### Multi-backend, two Instana endpoints (Windows)
+#### Multi-backend, two Instana endpoints (Windows)
 
 ```powershell
 .\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_AGENT_HOST_ONE firsthost -INSTANA_AGENT_HOST_TWO secondhost -INSTANA_PACKAGE_PATH exepackagepath -INSTANA_AGENT_KEY agent_key -INSTANA_DOWNLOAD_KEY download_key
 ```
 
-##### With a pre-configured mvn-settings file (Windows)
+#### With a pre-configured mvn-settings file (Windows)
 
 ```powershell
 .\instana-agent-installation.ps1 -AGENT_ZONE agentzone -AGENT_TAG agenttag -INSTANA_AGENT_HOST_ONE firsthost -INSTANA_AGENT_HOST_TWO secondhost -INSTANA_PACKAGE_PATH exepackagepath -INSTANA_AGENT_KEY agent_key -INSTANA_DOWNLOAD_KEY download_key -INSTANA_MVN_CONF_PATH mvnsettingspath
 ```
 
-#### Windows Uninstall
+### Windows Uninstall
 
 - Remove Instana from **Add or Remove Programs**
 - Delete the leftover directory at `C:\Program Files\Instana`
-
-
-## 🧩 Scope
-
-- Instana Agent installation & configuration  
-- Kubernetes / OpenShift agent integrations  
-- AutoTrace (Mutating Admission Webhook)  
-- Monolithic / VM-based integrations  
-- Airgap installation scenarios  
-- Operational automation scripts  
-
-
-## 📘 Notes
-
-- All platform configurations are **Kubernetes-native and OpenShift-compatible**  
-- Environment-specific differences (e.g., `openshift.enabled`) are handled in guides  
-- Scripts are **reference implementations** → adapt before production use  
-
-
-## 🤝 Contributing
-
-Feel free to open issues or contribute improvements.
-
-
-## 📎 References
-
-- Instana Docs: https://www.ibm.com/docs/en/instana-observability  
-- AutoTrace Webhook: https://artifacthub.io/packages/helm/instana/instana-autotrace-webhook  
-- Kubernetes Admission Controllers: https://kubernetes.io/blog/2019/03/21/a-guide-to-kubernetes-admission-controllers/  
